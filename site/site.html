@@ -1,0 +1,2295 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillPath - AI Карьерный Навигатор</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --primary: #b8a99a;
+            --primary-dark: #a89580;
+            --secondary: #d9c7b8;
+            --accent: #8a7865;
+            --dark: #e8e2db;
+            --darker: #d9d1c7;
+            --light: #fff;
+            --gray: #a8998a;
+            --neon: #8a7865;
+            --text-dark: #5a4d41;
+            --text-light: #7a6d5f;
+            --bg-light: #f5f0e8;
+            --bg-medium: #e8e2db;
+            --bg-dark: #d9d1c7;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-light) 0%, var(--bg-medium) 50%, var(--bg-dark) 100%);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(184, 169, 154, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(184, 169, 154, 0.6), 0 0 60px rgba(217, 199, 184, 0.3); }
+        }
+
+        @keyframes textGlow {
+            0%, 100% { text-shadow: 0 0 10px rgba(184, 169, 154, 0.5); }
+            50% { text-shadow: 0 0 20px rgba(184, 169, 154, 0.7), 0 0 30px rgba(217, 199, 184, 0.3); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1) rotate(180deg); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            padding: 25px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(184, 169, 154, 0.2);
+            transition: all 0.4s ease;
+        }
+
+        header.scrolled {
+            padding: 15px 0;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 10px 30px rgba(184, 169, 154, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            color: var(--neon);
+        }
+
+        .logo-glow {
+            color: var(--neon);
+            text-shadow: 0 0 20px rgba(138, 120, 101, 0.3);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-links a {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 10px 0;
+        }
+
+        .nav-links a:hover {
+            color: var(--neon);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--neon);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding-top: 100px;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(184, 169, 154, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(217, 199, 184, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(168, 149, 128, 0.15) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--neon);
+            border-radius: 50%;
+            animation: sparkle 3s ease-in-out infinite;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            z-index: 2;
+            animation: slideIn 1s ease-out;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            margin-bottom: 25px;
+            line-height: 1.1;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-dark) 0%, var(--neon) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.4rem;
+            margin-bottom: 40px;
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 20px 45px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px) rotateX(10deg);
+            box-shadow: 
+                0 25px 50px rgba(184, 169, 154, 0.4),
+                0 15px 30px rgba(217, 199, 184, 0.3);
+        }
+
+        .cta-button i {
+            margin-left: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .cta-button:hover i {
+            transform: translateX(5px);
+        }
+
+        .section {
+            padding: 120px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-title h2 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-dark) 0%, var(--neon) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-title p {
+            font-size: 1.3rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .step {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 50px 30px;
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(184, 169, 154, 0.3);
+            text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(184, 169, 154, 0.1);
+        }
+
+        .step::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .step:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 
+                0 30px 60px rgba(184, 169, 154, 0.2),
+                0 0 0 1px rgba(184, 169, 154, 0.2);
+        }
+
+        .step-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 2.5rem;
+            transform: rotate(45deg);
+            transition: all 0.4s ease;
+            color: white;
+        }
+
+        .step-icon i {
+            transform: rotate(-45deg);
+        }
+
+        .step:hover .step-icon {
+            transform: rotate(0deg) scale(1.1);
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+        }
+
+        .step h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .step p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .feature {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 50px 35px;
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(184, 169, 154, 0.3);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(184, 169, 154, 0.1);
+        }
+
+        .feature::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(184, 169, 154, 0.1) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .feature:hover::before {
+            opacity: 1;
+        }
+
+        .feature:hover {
+            transform: translateY(-10px);
+            box-shadow: 
+                0 25px 50px rgba(184, 169, 154, 0.2),
+                0 0 0 1px rgba(184, 169, 154, 0.2);
+        }
+
+        .feature i {
+            font-size: 3rem;
+            color: var(--neon);
+            margin-bottom: 25px;
+            display: block;
+        }
+
+        .feature h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .feature p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        footer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 80px 0 30px;
+            margin-top: 100px;
+            border-top: 1px solid rgba(184, 169, 154, 0.3);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 50px;
+        }
+
+        .footer-logo {
+            font-size: 2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-dark);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .footer-links a {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .footer-links a:hover {
+            color: var(--neon);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid rgba(184, 169, 154, 0.3);
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        @media (max-width: 1200px) {
+            .bot-section {
+                gap: 50px;
+                padding: 60px;
+            }
+        }
+
+        @media (max-width: 968px) {
+            .bot-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .steps, .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2.5rem;
+            }
+            
+            .bot-section {
+                padding: 40px 30px;
+            }
+        }
+
+        .video-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.05;
+            z-index: -1;
+        }
+
+        .survey-page {
+            display: none;
+            padding: 120px 0 60px;
+            min-height: 100vh;
+        }
+
+        .survey-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 25px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(184, 169, 154, 0.2);
+            border: 1px solid rgba(184, 169, 154, 0.3);
+        }
+
+        .survey-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .survey-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .survey-title p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .question {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            border: 1px solid rgba(184, 169, 154, 0.3);
+        }
+
+        .question h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 15px;
+            border: 1px solid rgba(184, 169, 154, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            background: rgba(184, 169, 154, 0.2);
+            transform: translateX(5px);
+        }
+
+        .option input {
+            margin-right: 15px;
+        }
+
+        .survey-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        .survey-button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .survey-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(184, 169, 154, 0.4);
+        }
+
+        .survey-button:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result-container {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .result-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+
+        .profession {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--neon);
+        }
+
+        .exam-info {
+            background: rgba(184, 169, 154, 0.3);
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .exam-info h3 {
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .exam-info ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+
+        .exam-info li {
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .exam-info li:before {
+            content: "•";
+            color: var(--neon);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+
+        .city-selection {
+            margin-top: 40px;
+        }
+
+        .city-selection h3 {
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+
+        .city-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .city-option {
+            padding: 15px;
+            background: white;
+            border-radius: 15px;
+            border: 1px solid rgba(184, 169, 154, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .city-option:hover {
+            background: rgba(184, 169, 154, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .city-option.selected {
+            background: var(--primary);
+            color: white;
+        }
+
+        .universities {
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        .university {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(184, 169, 154, 0.5);
+        }
+
+        .university h4 {
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        .university p {
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .restart-button {
+            margin-top: 30px;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .restart-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(184, 169, 154, 0.4);
+        }
+
+        /* Education Path Selection */
+        .path-selection {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .path-option {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .path-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .path-option h3 {
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .path-option p {
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    
+    <video autoplay muted loop class="video-background">
+        <source src="https://assets.mixkit.co/videos/preview/mixkit-network-connection-data-transfer-animation-49176-large.mp4" type="video/mp4">
+    </video>
+
+    
+    <div class="sparkle" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+    <div class="sparkle" style="top: 60%; left: 85%; animation-delay: 1s;"></div>
+    <div class="sparkle" style="top: 80%; left: 20%; animation-delay: 2s;"></div>
+    <div class="sparkle" style="top: 30%; left: 70%; animation-delay: 1.5s;"></div>
+
+    
+    <header id="header">
+        <div class="container">
+            <nav>
+                <a href="#" class="logo" onclick="showPage('home')">
+                    <i class="fas fa-route"></i>
+                    Skill<span class="logo-glow">Path</span>
+                </a>
+                <div class="nav-links">
+                    <a href="#" onclick="showPage('home')">Главная</a>
+                    <a href="#" onclick="showPage('survey')">Тестирование</a>
+                    <a href="#" onclick="showPage('features')">Преимущества</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    
+    <section class="hero" id="home-page">
+        <div class="hero-bg"></div>
+        <div class="container">
+            <div class="hero-content">
+                <h1>Карьера будущего<br>начинается здесь</h1>
+                <p>Искусственный интеллект анализирует ваш потенциал и строит персонализированный путь к профессии мечты. Начните свой путь к успеху уже сегодня.</p>
+                <a href="#" class="cta-button" onclick="showPage('survey')">
+                    Пройти тестирование
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    
+    <section class="section" id="how-it-works">
+        <div class="container">
+            <div class="section-title">
+                <h2>Как это работает</h2>
+                <p>Инновационный подход к построению карьеры с использованием передовых технологий</p>
+            </div>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h3>Пройти тестирование</h3>
+                    <p>Ответьте на вопросы о ваших интересах, навыках и карьерных предпочтениях</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>AI Анализ</h3>
+                    <p>Нейросеть обрабатывает ваши ответы и сравнивает с актуальными данными рынка труда</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3>Персональный план</h3>
+                    <p>Получите детализированную дорожную карту развития с пошаговыми рекомендациями</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <section class="section" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Преимущества SkillPath</h2>
+                <p>Инновационный подход к построению карьеры в цифровую эпоху</p>
+            </div>
+            <div class="features">
+                <div class="feature">
+                    <i class="fas fa-bolt"></i>
+                    <h3>Мгновенный AI-анализ</h3>
+                    <p>Нейросеть обрабатывает ваши данные в реальном времени и выдает персонализированные рекомендации за секунды</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-chart-network"></i>
+                    <h3>Актуальные данные рынка</h3>
+                    <p>Анализ тысяч вакансий и трендов для построения наиболее востребованных карьерных путей</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-user-astronaut"></i>
+                    <h3>Персональный подход</h3>
+                    <p>Учет вашего уникального опыта, навыков и карьерных амбиций при построении трека развития</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Survey Section -->
+    <section class="survey-page" id="survey-page">
+        <div class="container">
+            <div class="survey-container">
+                <!-- Выбор пути после 9 или 11 класса -->
+                <div id="education-path-selection">
+                    <h2>Выберите ваш образовательный путь</h2>
+                    <p>Это поможет нам подобрать подходящие варианты для вашего поступления</p>
+                    
+                    <div class="path-selection">
+                        <div class="path-option" onclick="selectEducationPath('9')">
+                            <h3>После 9 класса</h3>
+                            <p>Поступление в колледж или техникум</p>
+                            <p><small>На основе ОГЭ</small></p>
+                        </div>
+                        <div class="path-option" onclick="selectEducationPath('11')">
+                            <h3>После 11 класса</h3>
+                            <p>Поступление в университет или институт</p>
+                            <p><small>На основе ЕГЭ</small></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Вопросы теста -->
+                <div id="survey-questions" style="display: none;"></div>
+
+                <!-- Навигация -->
+                <div class="survey-nav" id="survey-navigation" style="display: none;">
+                    <button class="survey-button" id="prev-btn" onclick="prevQuestion()">Назад</button>
+                    <button class="survey-button" id="next-btn" onclick="nextQuestion()">Далее</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-route"></i>
+                    Skill<span class="logo-glow">Path</span>
+                </div>
+                <div class="footer-links">
+                    <a href="#" onclick="showPage('home')">Главная</a>
+                    <a href="#" onclick="showPage('survey')">Тестирование</a>
+                    <a href="#features">Преимущества</a>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 SkillPath. Все права защищены. | AI Карьерный Навигатор</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Определяем путь обучения (9 или 11 класс)
+        let educationPath = '';
+        
+        function selectEducationPath(path) {
+            educationPath = path;
+            document.getElementById('education-path-selection').style.display = 'none';
+            document.getElementById('survey-questions').style.display = 'block';
+            document.getElementById('survey-navigation').style.display = 'flex';
+            initSurvey();
+        }
+
+        // Данные для теста
+        const surveyData = [
+            {
+                question: "Какой тип деятельности вам больше нравится?",
+                options: [
+                    "Работа с людьми (общение, помощь, обучение)",
+                    "Аналитическая работа (исследования, вычисления, анализ)",
+                    "Творческая деятельность (дизайн, искусство, создание нового)",
+                    "Техническая работа (техника, программы, инженерия)",
+                    "Работа с природой (животные, растения, экология)",
+                    "Предпринимательская деятельность (бизнес, управление, продажи)"
+                ]
+            },
+            {
+                question: "Как вы предпочитаете работать?",
+                options: [
+                    "В команде, совместно с коллегами",
+                    "Самостоятельно, концентрируясь на задаче",
+                    "В гибком графике, с возможностью творческого подхода",
+                    "По четкому плану с конкретными задачами",
+                    "В динамичной среде с частыми изменениями",
+                    "С возможностью работать удаленно"
+                ]
+            },
+            {
+                question: "Что для вас важнее в работе?",
+                options: [
+                    "Стабильность и предсказуемость",
+                    "Высокий доход и карьерный рост",
+                    "Возможность самореализации и творчества",
+                    "Социальная значимость и помощь другим",
+                    "Гибкий график и свобода",
+                    "Интересные задачи и вызовы"
+                ]
+            },
+            {
+                question: "Какой школьный предмет вам нравился больше всего?",
+                options: [
+                    "Обществознание, литература, языки",
+                    "Математика, физика, информатика",
+                    "Искусство, музыка, технология",
+                    "Биология, химия, география",
+                    "История, право, экономика",
+                    "Физкультура, ОБЖ, технология"
+                ]
+            },
+            {
+                question: "Как вы относитесь к рутинной работе?",
+                options: [
+                    "Предпочитаю разнообразие и новые задачи",
+                    "Могу работать в режиме рутины, если это необходимо",
+                    "Стараюсь избегать повторяющихся задач",
+                    "Рутина меня не пугает, если работа интересная",
+                    "Предпочитаю чередовать рутину и творческие задачи",
+                    "Могу адаптироваться к любому формату работы"
+                ]
+            },
+            {
+                question: "Что вам лучше удается?",
+                options: [
+                    "Убеждать и договариваться с людьми",
+                    "Анализировать данные и находить закономерности",
+                    "Придумывать новые идеы и решения",
+                    "Работать с техникой и технологиями",
+                    "Организовывать и планировать процессы",
+                    "Работать с естественными науками"
+                ]
+            },
+            {
+                question: "Какой график работы вам предпочтительнее?",
+                options: [
+                    "Стандартный рабочий день с 9 до 18",
+                    "Гибкий график с возможностью удаленной работы",
+                    "Проектная работа с дедлайнами",
+                    "Сменный график или ненормированный рабочий день",
+                    "Частичная занятость или фриланс",
+                    "Любой график, если работа интересная"
+                ]
+            },
+            {
+                question: "Что для вас важнее в карьере?",
+                options: [
+                    "Стабильность и социальные гарантии",
+                    "Высокий доход и престиж",
+                    "Самореализация и интересные задачи",
+                    "Возможность помогать другим и приносить пользу",
+                    "Свобода и независимость",
+                    "Карьерный рост и развитие"
+                ]
+            },
+            {
+                question: "Как вы относитесь к публичным выступлениям?",
+                options: [
+                    "Комфортно чувствую себя перед аудиторией",
+                    "Предпочитаю работать без публичных выступлений",
+                    "Могу выступать, если хорошо подготовлен",
+                    "Испытываю дискомфорт при выступлениях",
+                    "Люблю выступать перед небольшой аудиторией",
+                    "Выступления - не проблема, если тема интересная"
+                ]
+            },
+            {
+                question: "Какой тип задач вам интереснее?",
+                options: [
+                    "Организационные и управленческие",
+                    "Исследовательские и аналитические",
+                    "Творческие и нестандартные",
+                    "Технические и практические",
+                    "Социальные и гуманитарные",
+                    "Коммерческие и предпринимательские"
+                ]
+            }
+        ];
+
+        // Расширенный список профессий (50 профессий)
+        const professions = {
+            // Гуманитарные и социальные профессии
+            "Психолог": {
+                exams: ["Биология", "Русский язык", "Обществознание", "Математика"],
+                subjects: ["Психология", "Биология", "Обществознание"],
+                avgScore: 75,
+                description: "Специалист по изучению психических процессов и оказанию психологической помощи",
+                path: "11"
+            },
+            "Социолог": {
+                exams: ["Обществознание", "Русский язык", "История", "Математика"],
+                subjects: ["Социология", "Математика", "Обществознание"],
+                avgScore: 78,
+                description: "Специалист по исследованию общества и социальных процессов",
+                path: "11"
+            },
+            "Юрист": {
+                exams: ["Обществознание", "История", "Русский язык", "Иностранный язык"],
+                subjects: ["Право", "История", "Обществознание"],
+                avgScore: 82,
+                description: "Специалист по правовым вопросам и законодательству",
+                path: "11"
+            },
+            "Учитель": {
+                exams: ["Профильный предмет", "Русский язык", "Обществознание", "Математика"],
+                subjects: ["Педагогика", "Профильный предмет", "Психология"],
+                avgScore: 72,
+                description: "Специалист по обучению и воспитанию подрастающего поколения",
+                path: "both"
+            },
+            "Переводчик": {
+                exams: ["Иностранный язык", "Русский язык", "История", "Обществознание"],
+                subjects: ["Иностранный язык", "Русский язык", "Культурология"],
+                avgScore: 80,
+                description: "Специалист по переводу с одного языка на другой",
+                path: "11"
+            },
+            "Журналист": {
+                exams: ["Литература", "Русский язык", "История", "Обществознание"],
+                subjects: ["Журналистика", "Литература", "История"],
+                avgScore: 77,
+                description: "Специалист по сбору, обработке и распространению информации",
+                path: "11"
+            },
+
+            // Технические и IT-профессии
+            "Инженер-программист": {
+                exams: ["Математика", "Информатика", "Физика", "Русский язык"],
+                subjects: ["Программирование", "Математика", "Информатика"],
+                avgScore: 80,
+                description: "Специалист по разработке программного обеспечения и IT-решений",
+                path: "both"
+            },
+            "Data Scientist": {
+                exams: ["Математика", "Информатика", "Физика", "Русский язык"],
+                subjects: ["Анализ данных", "Статистика", "Программирование"],
+                avgScore: 85,
+                description: "Специалист по анализу больших данных и машинному обучению",
+                path: "11"
+            },
+            "Веб-разработчик": {
+                exams: ["Информатика", "Математика", "Русский язык", "Физика"],
+                subjects: ["Веб-технологии", "Программирование", "Дизайн"],
+                avgScore: 76,
+                description: "Специалист по созданию и поддержке веб-сайтов и приложений",
+                path: "both"
+            },
+            "Системный администратор": {
+                exams: ["Информатика", "Математика", "Русский язык", "Физика"],
+                subjects: ["Информационные системы", "Сетевые технологии", "ОС"],
+                avgScore: 70,
+                description: "Специалист по обслуживанию компьютерных систем и сетей",
+                path: "both"
+            },
+            "Инженер-электроник": {
+                exams: ["Математика", "Физика", "Информатика", "Русский язык"],
+                subjects: ["Электроника", "Схемотехника", "Программирование"],
+                avgScore: 78,
+                description: "Специалист по разработке и обслуживанию электронных устройств",
+                path: "both"
+            },
+            "Специалист по кибербезопасности": {
+                exams: ["Информатика", "Математика", "Физика", "Русский язык"],
+                subjects: ["Кибербезопасность", "Сети", "Криптография"],
+                avgScore: 83,
+                description: "Специалист по защите информационных систем от кибератак",
+                path: "11"
+            },
+
+            // Творческие профессии
+            "Веб-дизайнер": {
+                exams: ["Информатика", "Математика", "Литература", "Русский язык"],
+                subjects: ["Дизайн", "Веб-технологии", "Графика"],
+                avgScore: 70,
+                description: "Специалист по созданию пользовательских интерфейсов и визуальному оформлению сайтов",
+                path: "both"
+            },
+            "Графический дизайнер": {
+                exams: ["Литература", "Русский язык", "Обществознание", "Математика"],
+                subjects: ["Дизайн", "Рисование", "Компьютерная графика"],
+                avgScore: 72,
+                description: "Специалист по созданию визуального контента для печати и цифровых носителей",
+                path: "both"
+            },
+            "Архитектор": {
+                exams: ["Математика", "Рисование", "История", "Русский язык"],
+                subjects: ["Архитектура", "Черчение", "Дизайн"],
+                avgScore: 82,
+                description: "Специалист по проектированию зданий и архитектурных объектов",
+                path: "11"
+            },
+            "Фотограф": {
+                exams: ["Литература", "Русский язык", "Обществознание", "История"],
+                subjects: ["Фотография", "Композиция", "Обработка изображений"],
+                avgScore: 68,
+                description: "Специалист по созданию художественных и коммерческих фотографий",
+                path: "both"
+            },
+            "Видеооператор": {
+                exams: ["Литература", "Русский язык", "Обществознание", "История"],
+                subjects: ["Видеосъемка", "Монтаж", "Режиссура"],
+                avgScore: 69,
+                description: "Специалист по видеосъемке и созданию видеоконтента",
+                path: "both"
+            },
+            "Иллюстратор": {
+                exams: ["Литература", "Русский язык", "Обществознание", "История"],
+                subjects: ["Рисование", "Компьютерная графика", "Композиция"],
+                avgScore: 71,
+                description: "Специалист по созданию иллюстраций для книг, журналов и цифровых изданий",
+                path: "both"
+            },
+
+            // Экономические и бизнес-профессии
+            "Менеджер по продажам": {
+                exams: ["Математика", "Русский язык", "Обществознание", "История"],
+                subjects: ["Маркетинг", "Экономика", "Психология"],
+                avgScore: 75,
+                description: "Специалист по управлению продажами, работе с клиентами и развитию бизнеса",
+                path: "both"
+            },
+            "Маркетолог": {
+                exams: ["Математика", "Обществознание", "Русский язык", "История"],
+                subjects: ["Маркетинг", "Статистика", "Экономика"],
+                avgScore: 78,
+                description: "Специалист по исследованию рынка и продвижению товаров и услуг",
+                path: "11"
+            },
+            "Бухгалтер": {
+                exams: ["Математика", "Обществознание", "Русский язык", "История"],
+                subjects: ["Бухгалтерия", "Налоги", "Экономика"],
+                avgScore: 76,
+                description: "Специалист по ведению финансовой отчетности предприятия",
+                path: "both"
+            },
+            "Аналитик данных": {
+                exams: ["Математика", "Информатика", "Обществознание", "Русский язык"],
+                subjects: ["Статистика", "Анализ данных", "Экономика"],
+                avgScore: 81,
+                description: "Специалист по сбору и анализу данных для бизнес-решений",
+                path: "11"
+            },
+            "Финансовый советник": {
+                exams: ["Математика", "Обществознание", "Русский язык", "История"],
+                subjects: ["Финансы", "Экономика", "Право"],
+                avgScore: 79,
+                description: "Специалист по консультированию в области финансов и инвестиций",
+                path: "11"
+            },
+            "Предприниматель": {
+                exams: ["Математика", "Обществознание", "Русский язык", "История"],
+                subjects: ["Экономика", "Менеджмент", "Право"],
+                avgScore: 77,
+                description: "Специалист по созданию и развитию собственного бизнеса",
+                path: "both"
+            },
+
+            // Медицинские профессии
+            "Врач": {
+                exams: ["Биология", "Химия", "Русский язык", "Математика"],
+                subjects: ["Медицина", "Биология", "Химия"],
+                avgScore: 85,
+                description: "Специалист по диагностике и лечению заболеваний",
+                path: "11"
+            },
+            "Фармацевт": {
+                exams: ["Биология", "Химия", "Русский язык", "Математика"],
+                subjects: ["Фармакология", "Химия", "Биология"],
+                avgScore: 78,
+                description: "Специалист по изготовлению и продаже лекарственных препаратов",
+                path: "both"
+            },
+            "Медсестра/медбрат": {
+                exams: ["Биология", "Химия", "Русский язык", "Математика"],
+                subjects: ["Медицина", "Сестринское дело", "Психология"],
+                avgScore: 72,
+                description: "Специалист по уходу за больными и помощи врачу",
+                path: "both"
+            },
+            "Стоматолог": {
+                exams: ["Биология", "Химия", "Русский язык", "Математика"],
+                subjects: ["Стоматология", "Биология", "Химия"],
+                avgScore: 84,
+                description: "Специалист по лечению заболеваний зубов и полости рта",
+                path: "11"
+            },
+            "Психиатр": {
+                exams: ["Биология", "Химия", "Русский язык", "Математика"],
+                subjects: ["Психиатрия", "Психология", "Неврология"],
+                avgScore: 86,
+                description: "Врач, специализирующийся на лечении психических расстройств",
+                path: "11"
+            },
+            "Ветеринар": {
+                exams: ["Биология", "Химия", "Русский язык", "Математика"],
+                subjects: ["Ветеринария", "Биология", "Химия"],
+                avgScore: 79,
+                description: "Специалист по лечению заболеваний у животных",
+                path: "both"
+            },
+
+            // Инженерные и технические профессии
+            "Инженер-строитель": {
+                exams: ["Математика", "Физика", "Русский язык", "Информатика"],
+                subjects: ["Строительство", "Черчение", "Механика"],
+                avgScore: 77,
+                description: "Специалист по проектированию и строительству зданий и сооружений",
+                path: "both"
+            },
+            "Инженер-механик": {
+                exams: ["Математика", "Физика", "Русский язык", "Информатика"],
+                subjects: ["Механика", "Материаловедение", "Черчение"],
+                avgScore: 76,
+                description: "Специалист по проектированию и обслуживанию механических систем",
+                path: "both"
+            },
+            "Инженер-энергетик": {
+                exams: ["Математика", "Физика", "Русский язык", "Информатика"],
+                subjects: ["Энергетика", "Электротехника", "Термодинамика"],
+                avgScore: 78,
+                description: "Специалист по проектированию и обслуживанию энергетических систем",
+                path: "both"
+            },
+            "Автомеханик": {
+                exams: ["Математика", "Физика", "Русский язык", "Технология"],
+                subjects: ["Автомеханика", "Двигатели", "Электрооборудование"],
+                avgScore: 65,
+                description: "Специалист по ремонту и обслуживанию автомобилей",
+                path: "both"
+            },
+            "Техник-программист": {
+                exams: ["Информатика", "Математика", "Русский язык", "Физика"],
+                subjects: ["Программирование", "Базы данных", "Сети"],
+                avgScore: 73,
+                description: "Специалист по разработке и обслуживанию программного обеспечения",
+                path: "both"
+            },
+            "Инженер-робототехник": {
+                exams: ["Математика", "Физика", "Информатика", "Русский язык"],
+                subjects: ["Робототехника", "Программирование", "Электроника"],
+                avgScore: 82,
+                description: "Специалист по проектированию и программированию роботов",
+                path: "11"
+            },
+
+            // Естественнонаучные профессии
+            "Биолог": {
+                exams: ["Биология", "Химия", "Русский язык", "Математика"],
+                subjects: ["Биология", "Химия", "Экология"],
+                avgScore: 80,
+                description: "Специалист по изучению живых организмов и их взаимодействия",
+                path: "11"
+            },
+            "Химик": {
+                exams: ["Химия", "Биология", "Русский язык", "Математика"],
+                subjects: ["Химия", "Биология", "Физика"],
+                avgScore: 81,
+                description: "Специалист по изучению веществ и их превращений",
+                path: "11"
+            },
+            "Эколог": {
+                exams: ["Биология", "Химия", "Русский язык", "Математика"],
+                subjects: ["Экология", "Биология", "Химия"],
+                avgScore: 77,
+                description: "Специалист по охране окружающей среды и рациональному природопользованию",
+                path: "both"
+            },
+            "Геолог": {
+                exams: ["География", "Физика", "Русский язык", "Математика"],
+                subjects: ["Геология", "География", "Химия"],
+                avgScore: 76,
+                description: "Специалист по изучению строения Земли и поиску полезных ископаемых",
+                path: "11"
+            },
+            "Метеоролог": {
+                exams: ["География", "Физика", "Русский язык", "Математика"],
+                subjects: ["Метеорология", "Физика", "География"],
+                avgScore: 75,
+                description: "Специалист по изучению атмосферных явлений и прогнозированию погоды",
+                path: "11"
+            },
+            "Физик": {
+                exams: ["Физика", "Математика", "Русский язык", "Информатика"],
+                subjects: ["Физика", "Математика", "Информатика"],
+                avgScore: 83,
+                description: "Специалист по изучению свойств материи и законов природы",
+                path: "11"
+            },
+
+            // Другие профессии
+            "Повар": {
+                exams: ["Биология", "Химия", "Русский язык", "Технология"],
+                subjects: ["Кулинария", "Санитария", "Товароведение"],
+                avgScore: 65,
+                description: "Специалист по приготовлению пищи",
+                path: "both"
+            },
+            "Кондитер": {
+                exams: ["Биология", "Химия", "Русский язык", "Технология"],
+                subjects: ["Кондитерское дело", "Рисование", "Товароведение"],
+                avgScore: 67,
+                description: "Специалист по изготовлению кондитерских изделий",
+                path: "both"
+            },
+            "Парикмахер": {
+                exams: ["Химия", "Биология", "Русский язык", "Технология"],
+                subjects: ["Парикмахерское искусство", "Химия", "Рисование"],
+                avgScore: 63,
+                description: "Специалист по созданию причесок и уходу за волосами",
+                path: "both"
+            },
+            "Визажист": {
+                exams: ["Химия", "Биология", "Русский язык", "Рисование"],
+                subjects: ["Визаж", "Колористика", "Анатомия"],
+                avgScore: 66,
+                description: "Специалист по созданию макияжа и образа",
+                path: "both"
+            },
+            "Ландшафтный дизайнер": {
+                exams: ["Биология", "География", "Русский язык", "Рисование"],
+                subjects: ["Ландшафтный дизайн", "Ботаника", "Черчение"],
+                avgScore: 74,
+                description: "Специалист по проектированию и созданию садов и парков",
+                path: "both"
+            },
+            "Спортсмен": {
+                exams: ["Физкультура", "Биология", "Русский язык", "Обществознание"],
+                subjects: ["Физкультура", "Анатомия", "Психология"],
+                avgScore: 68,
+                description: "Профессиональный спортсмен или тренер",
+                path: "both"
+            },
+            "Полицейский": {
+                exams: ["Обществознание", "История", "Русский язык", "Физкультура"],
+                subjects: ["Право", "Физкультура", "Психология"],
+                avgScore: 72,
+                description: "Сотрудник правоохранительных органов",
+                path: "both"
+            },
+            "Спасатель": {
+                exams: ["ОБЖ", "Физкультура", "Русский язык", "Биология"],
+                subjects: ["Спасательное дело", "Медицина", "Психология"],
+                avgScore: 71,
+                description: "Специалист по спасению людей в чрезвычайных ситуациях",
+                path: "both"
+            },
+            "Стоматологический гигиенист": {
+                exams: ["Биология", "Химия", "Русский язык", "Математика"],
+                subjects: ["Стоматология", "Гигиена", "Анатомия"],
+                avgScore: 70,
+                description: "Специалист по профилактике заболеваний полости рта",
+                path: "both"
+            }
+        };
+
+        // Расширенный список городов и учебных заведений
+        const educationInstitutions = {
+    "Москва": {
+        universities: [
+            {name: "МГУ им. М.В. Ломоносова", specialty: "Фундаментальная медицина", score: 98, type: "университет"},
+            {name: "МФТИ", specialty: "Прикладная математика и информатика", score: 97, type: "университет"},
+            {name: "НИУ ВШЭ", specialty: "Экономика", score: 96, type: "университет"},
+            {name: "МГИМО", specialty: "Международные отношения", score: 95, type: "университет"},
+            {name: "РАНХиГС", specialty: "Государственное и муниципальное управление", score: 94, type: "университет"},
+            {name: "МИСиС", specialty: "Информатика и вычислительная техника", score: 93, type: "университет"},
+            {name: "РЭУ им. Г.В. Плеханова", specialty: "Менеджмент", score: 92, type: "университет"},
+            {name: "МГТУ им. Н.Э. Баумана", specialty: "Информационная безопасность", score: 95, type: "университет"},
+            {name: "РНИМУ им. Н.И. Пирогова", specialty: "Лечебное дело", score: 96, type: "университет"},
+            {name: "Финансовый университет при Правительстве РФ", specialty: "Финансы и кредит", score: 94, type: "университет"}
+        ],
+        colleges: [
+            {name: "Московский медицинский колледж №1", specialty: "Сестринское дело", score: 4.8, type: "колледж"},
+            {name: "Московский колледж управления, гостиничного бизнеса и ИТ 'Царицыно'", specialty: "Гостиничное дело", score: 4.7, type: "колледж"},
+            {name: "Московский приборостроительный техникум", specialty: "Компьютерные системы и комплексы", score: 4.6, type: "колледж"},
+            {name: "Колледж связи №54", specialty: "Инфокоммуникационные сети", score: 4.5, type: "колледж"},
+            {name: "Юридический колледж РГУП", specialty: "Право и организация соц. обеспечения", score: 4.9, type: "колледж"},
+            {name: "Московский финансовый колледж", specialty: "Экономика и бухгалтерский учет", score: 4.8, type: "колледж"},
+            {name: "Московский издательско-полиграфический колледж", specialty: "Графический дизайн", score: 4.4, type: "колледж"},
+            {name: "Московский строительный техникум", specialty: "Строительство и эксплуатация зданий", score: 4.5, type: "колледж"},
+            {name: "Московский колледж архитектуры и градостроительства", specialty: "Архитектура", score: 4.7, type: "колледж"},
+            {name: "Технологический колледж №24", specialty: "Поварское и кондитерское дело", score: 4.3, type: "колледж"}
+        ]
+    },
+    "Санкт-Петербург": {
+        universities: [
+            {name: "СПбГУ", specialty: "Юриспруденция", score: 95, type: "университет"},
+            {name: "Университет ИТМО", specialty: "Программная инженерия", score: 96, type: "университет"},
+            {name: "СПбПУ Петра Великого", specialty: "Информатика и вычислительная техника", score: 92, type: "университет"},
+            {name: "РГПУ им. А.И. Герцена", specialty: "Педагогическое образование", score: 88, type: "университет"},
+            {name: "СПбГЭУ", specialty: "Экономика", score: 91, type: "университет"},
+            {name: "СПбГУТ им. Бонч-Бруевича", specialty: "Радиотехника", score: 89, type: "университет"},
+            {name: "СПбГМУ им. Павлова", specialty: "Лечебное дело", score: 94, type: "университет"},
+            {name: "Горный университет", specialty: "Нефтегазовое дело", score: 90, type: "университет"},
+            {name: "СПбГУАП", specialty: "Управление в технических системах", score: 87, type: "университет"},
+            {name: "СПбГТИ", specialty: "Химическая технология", score: 89, type: "университет"}
+        ],
+        colleges: [
+            {name: "Санкт-Петербургский медицинский колледж им. В.М. Бехтерева", specialty: "Лечебное дело", score: 4.8, type: "колледж"},
+            {name: "Колледж туризма и гостиничного сервиса", specialty: "Туризм", score: 4.6, type: "колледж"},
+            {name: "Петровский колледж", specialty: "Информационные системы", score: 4.5, type: "колледж"},
+            {name: "Санкт-Петербургский технический колледж управления и коммерции", specialty: "Коммерция", score: 4.4, type: "колледж"},
+            {name: "Колледж судостроения и прикладных технологий", specialty: "Судостроение", score: 4.7, type: "колледж"},
+            {name: "Санкт-Петербургский политехнический колледж", specialty: "Технология машиностроения", score: 4.6, type: "колледж"},
+            {name: "Радиотехнический колледж", specialty: "Радиоаппаратостроение", score: 4.5, type: "колледж"},
+            {name: "Колледж 'Звездный'", specialty: "Правоохранительная деятельность", score: 4.9, type: "колледж"},
+            {name: "Санкт-Петербургский архитектурно-строительный колледж", specialty: "Строительство", score: 4.7, type: "колледж"},
+            {name: "Колледж пищевых технологий", specialty: "Технология продукции общепита", score: 4.3, type: "колледж"}
+        ]
+    },
+    "Казань": {
+        universities: [
+            {name: "КФУ", specialty: "Прикладная математика и информатика", score: 93, type: "университет"},
+            {name: "КНИТУ-КАИ", specialty: "Самолёто- и вертолётостроение", score: 91, type: "университет"},
+            {name: "КГМУ", specialty: "Лечебное дело", score: 94, type: "университет"},
+            {name: "КНИТУ", specialty: "Химическая технология", score: 89, type: "университет"},
+            {name: "КГАСУ", specialty: "Архитектура", score: 90, type: "университет"},
+            {name: "КГЭУ", specialty: "Электроэнергетика", score: 86, type: "университет"},
+            {name: "КГАУ", specialty: "Ветеринария", score: 85, type: "университет"},
+            {name: "ТИСБИ", specialty: "Экономика", score: 87, type: "университет"},
+            {name: "Академия социального образования", specialty: "Психология", score: 84, type: "университет"},
+            {name: "КГИК", specialty: "Музыкально-инструментальное искусство", score: 88, type: "университет"}
+        ],
+        colleges: [
+            {name: "Казанский медицинский колледж", specialty: "Сестринское дело", score: 4.8, type: "колледж"},
+            {name: "Казанский авиационно-технический колледж", specialty: "Производство авиационных двигателей", score: 4.7, type: "колледж"},
+            {name: "Казанский торгово-экономический колледж", specialty: "Коммерция", score: 4.5, type: "колледж"},
+            {name: "Казанский нефтехимический колледж", specialty: "Переработка нефти и газа", score: 4.6, type: "колледж"},
+            {name: "Казанский строительный колледж", specialty: "Строительство и эксплуатация зданий", score: 4.5, type: "колледж"},
+            {name: "Казанский радиомеханический колледж", specialty: "Радиоаппаратостроение", score: 4.4, type: "колледж"},
+            {name: "Казанский юридический колледж", specialty: "Право и организация соц. обеспечения", score: 4.7, type: "колледж"},
+            {name: "Казанский автотранспортный колледж", specialty: "Техническое обслуживание авто", score: 4.5, type: "колледж"},
+            {name: "Казанский художественно-гуманитарный колледж", specialty: "Дизайн", score: 4.6, type: "колледж"},
+            {name: "Казанский музыкальный колледж", specialty: "Инструментальное исполнительство", score: 4.9, type: "колледж"}
+        ]
+    },
+    "Нижний Новгород": {
+        universities: [
+            {name: "ННГУ им. Лобачевского", specialty: "Информационная безопасность", score: 91, type: "университет"},
+            {name: "НГТУ им. Алексеева", specialty: "Автомобилестроение", score: 88, type: "университет"},
+            {name: "НГПУ им. Козьмы Минина", specialty: "Педагогическое образование", score: 85, type: "университет"},
+            {name: "НГСХА", specialty: "Агроинженерия", score: 81, type: "университет"},
+            {name: "НГИЭУ", specialty: "Экономика", score: 87, type: "университет"},
+            {name: "НГАСУ", specialty: "Строительство", score: 86, type: "университет"},
+            {name: "НГЛУ им. Добролюбова", specialty: "Лингвистика", score: 89, type: "университет"},
+            {name: "НГМА", specialty: "Лечебное дело", score: 90, type: "университет"},
+            {name: "НГУАК", specialty: "Архитектура", score: 87, type: "университет"},
+            {name: "НГК им. Глинки", specialty: "Музыкально-инструментальное искусство", score: 92, type: "университет"}
+        ],
+        colleges: [
+            {name: "Нижегородский медицинский колледж", specialty: "Сестринское дело", score: 4.7, type: "колледж"},
+            {name: "Нижегородский авиационный технический колледж", specialty: "Технология машиностроения", score: 4.6, type: "колледж"},
+            {name: "Нижегородский строительный колледж", specialty: "Строительство и эксплуатация зданий", score: 4.5, type: "колледж"},
+            {name: "Нижегородский автотранспортный колледж", specialty: "Техническое обслуживание авто", score: 4.4, type: "колледж"},
+            {name: "Нижегородский радиотехнический колледж", specialty: "Радиоаппаратостроение", score: 4.5, type: "колледж"},
+            {name: "Нижегородский губернский колледж", specialty: "Право и организация соц. обеспечения", score: 4.6, type: "колледж"},
+            {name: "Нижегородский колледж теплоснабжения", specialty: "Теплоснабжение", score: 4.3, type: "колледж"},
+            {name: "Нижегородский политехнический колледж", specialty: "Компьютерные системы и комплексы", score: 4.5, type: "колледж"},
+            {name: "Нижегородский художественный колледж", specialty: "Живопись", score: 4.8, type: "колледж"},
+            {name: "Нижегородский музыкальный колледж", specialty: "Вокальное искусство", score: 4.9, type: "колледж"}
+        ]
+    },
+    "Ростов-на-Дону": {
+        universities: [
+            {name: "ЮФУ", specialty: "Программная инженерия", score: 90, type: "университет"},
+            {name: "ДГТУ", specialty: "Строительство", score: 86, type: "университет"},
+            {name: "РГЭУ (РИНХ)", specialty: "Экономика", score: 88, type: "университет"},
+            {name: "РостГМУ", specialty: "Лечебное дело", score: 92, type: "университет"},
+            {name: "ЮРИУ РАНХиГС", specialty: "Государственное управление", score: 87, type: "университет"},
+            {name: "РГУПС", specialty: "Строительство железных дорог", score: 85, type: "университет"},
+            {name: "РГСУ", specialty: "Психология", score: 84, type: "университет"},
+            {name: "Академия архитектуры и искусств ЮФУ", specialty: "Архитектура", score: 89, type: "университет"},
+            {name: "СКСИ", specialty: "Физическая культура", score: 83, type: "университет"},
+            {name: "РКИ", specialty: "Востоковедение", score: 86, type: "университет"}
+        ],
+        colleges: [
+            {name: "Ростовский-на-Дону колледж связи и информатики", specialty: "Инфокоммуникационные сети", score: 4.6, type: "колледж"},
+            {name: "Ростовский базовый медицинский колледж", specialty: "Сестринское дело", score: 4.8, type: "колледж"},
+            {name: "Ростовский-на-Дону строительный колледж", specialty: "Строительство и эксплуатация зданий", score: 4.5, type: "колледж"},
+            {name: "Ростовский-на-Дону колледж водного транспорта", specialty: "Судовождение", score: 4.7, type: "колледж"},
+            {name: "Ростовский-на-Дону машиностроительный колледж", specialty: "Технология машиностроения", score: 4.5, type: "колледж"},
+            {name: "Ростовский-на-Дону торгово-экономический колледж", specialty: "Коммерция", score: 4.4, type: "колледж"},
+            {name: "Ростовский-на-Дону юридический колледж", specialty: "Право и организация соц. обеспечения", score: 4.7, type: "колледж"},
+            {name: "Ростовский-на-Дону колледж искусств", specialty: "Дизайн", score: 4.6, type: "колледж"},
+            {name: "Ростовский-на-Дону педагогический колледж", specialty: "Дошкольное образование", score: 4.5, type: "колледж"},
+            {name: "Ростовский-на-Дону музыкальный колледж", specialty: "Инструментальное исполнительство", score: 4.9, type: "колледж"}
+        ]
+    },
+    "Краснодар": {
+        universities: [
+            {name: "КубГУ", specialty: "Юриспруденция", score: 89, type: "университет"},
+            {name: "КубГАУ", specialty: "Агроинженерия", score: 83, type: "университет"},
+            {name: "КубГТУ", specialty: "Пищевая биотехнология", score: 85, type: "университет"},
+            {name: "КубГМУ", specialty: "Лечебное дело", score: 91, type: "университет"},
+            {name: "КГИК", specialty: "Народная художественная культура", score: 86, type: "университет"},
+            {name: "КГУФКСТ", specialty: "Физическая культура", score: 84, type: "университет"},
+            {name: "Краснодарский университет МВД", specialty: "Правоохранительная деятельность", score: 92, type: "университет"},
+            {name: "СГУ", specialty: "Экономика", score: 87, type: "университет"},
+            {name: "МПСУ", specialty: "Психология", score: 85, type: "университет"},
+            {name: "КГАВТ", specialty: "Эксплуатация судов", score: 82, type: "университет"}
+        ],
+        colleges: [
+            {name: "Краснодарский медицинский колледж", specialty: "Сестринское дело", score: 4.7, type: "колледж"},
+            {name: "Краснодарский архитектурно-строительный колледж", specialty: "Архитектура", score: 4.6, type: "колледж"},
+            {name: "Краснодарский машиностроительный колледж", specialty: "Технология машиностроения", score: 4.5, type: "колледж"},
+            {name: "Краснодарский информационно-технологический колледж", specialty: "Информационные системы", score: 4.5, type: "колледж"},
+            {name: "Краснодарский торгово-экономический колледж", specialty: "Экономика и бухгалтерский учет", score: 4.4, type: "колледж"},
+            {name: "Краснодарский педагогический колледж", specialty: "Преподавание в начальных классах", score: 4.6, type: "колледж"},
+            {name: "Краснодарский музыкальный колледж", specialty: "Вокальное искусство", score: 4.9, type: "колледж"},
+            {name: "Краснодарский колледж электронного приборостроения", specialty: "Радиоаппаратостроение", score: 4.4, type: "колледж"},
+            {name: "Краснодарский юридический колледж", specialty: "Право и организация соц. обеспечения", score: 4.7, type: "колледж"},
+            {name: "Краснодарский колледж культуры", specialty: "Социально-культурная деятельность", score: 4.5, type: "колледж"}
+        ]
+    },
+    "Воронеж": {
+        universities: [
+            {name: "ВГУ", specialty: "Фундаментальная информатика", score: 88, type: "университет"},
+            {name: "ВГТУ", specialty: "Машиностроение", score: 85, type: "университет"},
+            {name: "ВГМУ", specialty: "Лечебное дело", score: 92, type: "университет"},
+            {name: "ВГАУ", specialty: "Агроинженерия", score: 82, type: "университет"},
+            {name: "ВГПУ", specialty: "Педагогическое образование", score: 84, type: "университет"},
+            {name: "ВГУИТ", specialty: "Пищевая биотехнология", score: 83, type: "университет"},
+            {name: "ВГИИ", specialty: "Музыкально-инструментальное искусство", score: 89, type: "университет"},
+            {name: "РАНХиГС", specialty: "Государственное управление", score: 86, type: "университет"},
+            {name: "ВФ РАНХиГС", specialty: "Менеджмент", score: 85, type: "университет"},
+            {name: "ВГАСУ", specialty: "Строительство", score: 86, type: "университет"}
+        ],
+        colleges: [
+            {name: "Воронежский медицинский колледж", specialty: "Сестринское дело", score: 4.7, type: "колледж"},
+            {name: "Воронежский политехнический колледж", specialty: "Технология машиностроения", score: 4.6, type: "колледж"},
+            {name: "Воронежский юридический колледж", specialty: "Право и организация соц. обеспечения", score: 4.8, type: "колледж"},
+            {name: "Воронежский строительный колледж", specialty: "Строительство и эксплуатация зданий", score: 4.5, type: "колледж"},
+            {name: "Воронежский авиационный техникум", specialty: "Производство авиационных двигателей", score: 4.7, type: "колледж"},
+            {name: "Воронежский колледж сварки и промышленных технологий", specialty: "Сварочное производство", score: 4.4, type: "колледж"},
+            {name: "Воронежский музыкальный колледж", specialty: "Инструментальное исполнительство", score: 4.9, type: "колледж"},
+            {name: "Воронежский торгово-экономический колледж", specialty: "Коммерция", score: 4.4, type: "колледж"},
+            {name: "Воронежский колледж нефти и газа", specialty: "Разработка нефтяных месторождений", score: 4.6, type: "колледж"},
+            {name: "Воронежский художественный колледж", specialty: "Живопись", score: 4.8, type: "колледж"}
+        ]
+    },
+    "Самара": {
+        universities: [
+            {name: "СамГУ", specialty: "Юриспруденция", score: 88, type: "университет"},
+            {name: "СамГТУ", specialty: "Авиастроение", score: 89, type: "университет"},
+            {name: "СГМУ", specialty: "Лечебное дело", score: 91, type: "университет"},
+            {name: "СГЭУ", specialty: "Экономика", score: 86, type: "университет"},
+            {name: "СамНЦ РАН", specialty: "Фундаментальная механика", score: 90, type: "университет"},
+            {name: "СГАУ", specialty: "Ракетные комплексы", score: 92, type: "университет"},
+            {name: "СГИК", specialty: "Социально-культурная деятельность", score: 84, type: "университет"},
+            {name: "ПГУТИ", specialty: "Инфокоммуникационные технологии", score: 85, type: "университет"},
+            {name: "СамГУПС", specialty: "Строительство железных дорог", score: 83, type: "университет"},
+            {name: "СФ МГПУ", specialty: "Педагогическое образование", score: 82, type: "университет"}
+        ],
+        colleges: [
+            {name: "Самарский медицинский колледж", specialty: "Сестринское дело", score: 4.7, type: "колледж"},
+            {name: "Самарский авиационный техникум", specialty: "Технология машиностроения", score: 4.8, type: "колледж"},
+            {name: "Самарский металлургический колледж", specialty: "Обработка металлов", score: 4.5, type: "колледж"},
+            {name: "Самарский колледж транспорта и коммуникаций", specialty: "Организация перевозок", score: 4.6, type: "колледж"},
+            {name: "Самарский государственный колледж сервисных технологий", specialty: "Парикмахерское искусство", score: 4.4, type: "колледж"},
+            {name: "Самарский техникум кулинарного искусства", specialty: "Технология продукции общепита", score: 4.3, type: "колледж"},
+            {name: "Самарский художественный колледж", specialty: "Дизайн", score: 4.7, type: "колледж"},
+            {name: "Самарский музыкальный колледж", specialty: "Вокальное искусство", score: 4.9, type: "колледж"},
+            {name: "Самарский юридический колледж", specialty: "Право и организация соц. обеспечения", score: 4.6, type: "колледж"},
+            {name: "Самарский политехнический колледж", specialty: "Компьютерные системы и комплексы", score: 4.5, type: "колледж"}
+        ]
+    },
+    "Уфа": {
+        universities: [
+            {name: "БГУ", specialty: "Нефтегазовое дело", score: 87, type: "университет"},
+            {name: "УГНТУ", specialty: "Химическая технология", score: 88, type: "университет"},
+            {name: "БГМУ", specialty: "Лечебное дело", score: 91, type: "университет"},
+            {name: "УГАТУ", specialty: "Авиастроение", score: 89, type: "университет"},
+            {name: "БГПУ", specialty: "Педагогическое образование", score: 84, type: "университет"},
+            {name: "УЮИ", specialty: "Юриспруденция", score: 86, type: "университет"},
+            {name: "БАГСУ", specialty: "Государственное управление", score: 85, type: "университет"},
+            {name: "УГИИ", specialty: "Музыкально-инструментальное искусство", score: 90, type: "университет"},
+            {name: "БГАУ", specialty: "Агроинженерия", score: 81, type: "университет"},
+            {name: "УФИВТ", specialty: "Судовождение", score: 83, type: "университет"}
+        ],
+        colleges: [
+            {name: "Уфимский медицинский колледж", specialty: "Сестринское дело", score: 4.8, type: "колледж"},
+            {name: "Уфимский топливно-энергетический колледж", specialty: "Разработка нефтяных месторождений", score: 4.7, type: "колледж"},
+            {name: "Уфимский авиационный техникум", specialty: "Производство авиационных двигателей", score: 4.8, type: "колледж"},
+            {name: "Уфимский политехнический колледж", specialty: "Технология машиностроения", score: 4.6, type: "колледж"},
+            {name: "Уфимский колледж радиоэлектроники", specialty: "Радиоаппаратостроение", score: 4.5, type: "колледж"},
+            {name: "Уфимский юридический колледж", specialty: "Право и организация соц. обеспечения", score: 4.7, type: "колледж"},
+            {name: "Уфимский художественно-гуманитарный колледж", specialty: "Дизайн", score: 4.6, type: "колледж"},
+            {name: "Уфимский торгово-экономический колледж", specialty: "Коммерция", score: 4.4, type: "колледж"},
+            {name: "Уфимский музыкальный колледж", specialty: "Инструментальное исполнительство", score: 4.9, type: "колледж"},
+            {name: "Уфимский колледж статистики и информатики", specialty: "Информационные системы", score: 4.5, type: "колледж"}
+        ]
+    },
+    "Красноярск": {
+        universities: [
+            {name: "СФУ", specialty: "Информатика и вычислительная техника", score: 88, type: "университет"},
+            {name: "СибГУ им. Решетнева", specialty: "Ракетные комплексы", score: 90, type: "университет"},
+            {name: "КрасГМУ", specialty: "Лечебное дело", score: 92, type: "университет"},
+            {name: "КГПУ", specialty: "Педагогическое образование", score: 84, type: "университет"},
+            {name: "КГАУ", specialty: "Агроинженерия", score: 81, type: "университет"},
+            {name: "СибГАУ", specialty: "Экономика", score: 85, type: "университет"},
+            {name: "КГИИ", specialty: "Музыкально-инструментальное искусство", score: 89, type: "университет"},
+            {name: "КГАСУ", specialty: "Строительство", score: 86, type: "университет"},
+            {name: "СФУ (ЮИ)", specialty: "Юриспруденция", score: 87, type: "университет"},
+            {name: "Красноярский ГАУ", specialty: "Ветеринария", score: 83, type: "университет"}
+        ],
+        colleges: [
+            {name: "Красноярский медицинский колледж", specialty: "Сестринское дело", score: 4.7, type: "колледж"},
+            {name: "Красноярский авиационный техникум", specialty: "Технология машиностроения", score: 4.8, type: "колледж"},
+            {name: "Красноярский монтажный колледж", specialty: "Строительство и эксплуатация зданий", score: 4.6, type: "колледж"},
+            {name: "Красноярский политехнический колледж", specialty: "Компьютерные системы и комплексы", score: 4.5, type: "колледж"},
+            {name: "Красноярский торгово-экономический колледж", specialty: "Экономика и бухгалтерский учет", score: 4.4, type: "колледж"},
+            {name: "Красноярский юридический колледж", specialty: "Право и организация соц. обеспечения", score: 4.7, type: "колледж"},
+            {name: "Красноярский художественный колледж", specialty: "Живопись", score: 4.8, type: "колледж"},
+            {name: "Красноярский музыкальный колледж", specialty: "Вокальное искусство", score: 4.9, type: "колледж"},
+            {name: "Красноярский колледж радиоэлектроники", specialty: "Радиоаппаратостроение", score: 4.5, type: "колледж"},
+            {name: "Красноярский педагогический колледж", specialty: "Дошкольное образование", score: 4.6, type: "колледж"}
+        ]
+    },
+    "Пермь": {
+        universities: [
+            {name: "ПГНИУ", specialty: "Информационная безопасность", score: 87, type: "университет"},
+            {name: "ПНИПУ", specialty: "Нефтегазовое дело", score: 88, type: "университет"},
+            {name: "ПГМУ", specialty: "Лечебное дело", score: 91, type: "университет"},
+            {name: "ПГФА", specialty: "Фармация", score: 89, type: "университет"},
+            {name: "ПГГПУ", specialty: "Педагогическое образование", score: 84, type: "университет"},
+            {name: "ПГИК", specialty: "Социально-культурная деятельность", score: 85, type: "университет"},
+            {name: "ПГАТУ", specialty: "Агроинженерия", score: 81, type: "университет"},
+            {name: "ПГУПС", specialty: "Строительство железных дорог", score: 86, type: "университет"},
+            {name: "ПФ РАНХиГС", specialty: "Государственное управление", score: 85, type: "университет"},
+            {name: "ПГУ", specialty: "Экономика", score: 86, type: "университет"}
+        ],
+        colleges: [
+            {name: "Пермский медицинский колледж", specialty: "Сестринское дело", score: 4.7, type: "колледж"},
+            {name: "Пермский нефтяной колледж", specialty: "Разработка нефтяных месторождений", score: 4.8, type: "колледж"},
+            {name: "Пермский авиационный техникум", specialty: "Технология машиностроения", score: 4.7, type: "колледж"},
+            {name: "Пермский политехнический колледж", specialty: "Компьютерные системы и комплексы", score: 4.6, type: "колледж"},
+            {name: "Пермский строительный колледж", specialty: "Строительство и эксплуатация зданий", score: 4.5, type: "колледж"},
+            {name: "Пермский педагогический колледж", specialty: "Дошкольное образование", score: 4.6, type: "колледж"},
+            {name: "Пермский торгово-технологический колледж", specialty: "Коммерция", score: 4.4, type: "колледж"},
+            {name: "Пермский музыкальный колледж", specialty: "Инструментальное исполнительство", score: 4.9, type: "колледж"},
+            {name: "Пермский химико-технологический колледж", specialty: "Аналитический контроль", score: 4.5, type: "колледж"},
+            {name: "Пермский колледж экономики и управления", specialty: "Экономика и бухгалтерский учет", score: 4.6, type: "колледж"}
+        ]
+    },
+    "Волгоград": {
+        universities: [
+            {name: "ВолГУ", specialty: "Юриспруденция", score: 87, type: "университет"},
+            {name: "ВолгГТУ", specialty: "Химическая технология", score: 86, type: "университет"},
+            {name: "ВолгГМУ", specialty: "Лечебное дело", score: 91, type: "университет"},
+            {name: "ВГСПУ", specialty: "Педагогическое образование", score: 84, type: "университет"},
+            {name: "ВГАФК", specialty: "Физическая культура", score: 85, type: "университет"},
+            {name: "ВолГАУ", specialty: "Агроинженерия", score: 81, type: "университет"},
+            {name: "ВИБ", specialty: "Экономика", score: 83, type: "университет"},
+            {name: "ВГИИК", specialty: "Народная художественная культура", score: 86, type: "университет"},
+            {name: "ВолГТУ (филиал)", specialty: "Строительство", score: 82, type: "университет"},
+            {name: "ВФ РАНХиГС", specialty: "Государственное управление", score: 85, type: "университет"}
+        ],
+        colleges: [
+            {name: "Волгоградский медицинский колледж", specialty: "Сестринское дело", score: 4.7, type: "колледж"},
+            {name: "Волгоградский технологический колледж", specialty: "Технология машиностроения", score: 4.6, type: "колледж"},
+            {name: "Волгоградский строительный колледж", specialty: "Строительство и эксплуатация зданий", score: 4.5, type: "колледж"},
+            {name: "Волгоградский энергетический колледж", specialty: "Теплоснабжение", score: 4.4, type: "колледж"},
+            {name: "Волгоградский колледж управления и новых технологий", specialty: "Информационные системы", score: 4.5, type: "колледж"},
+            {name: "Волгоградский педагогический колледж", specialty: "Преподавание в начальных классах", score: 4.6, type: "колледж"},
+            {name: "Волгоградский музыкальный колледж", specialty: "Вокальное искусство", score: 4.9, type: "колледж"},
+            {name: "Волгоградский колледж ресторанного сервиса", specialty: "Технология продукции общепита", score: 4.3, type: "колледж"},
+            {name: "Волгоградский юридический колледж", specialty: "Право и организация соц. обеспечения", score: 4.7, type: "колледж"},
+            {name: "Волгоградский художественный колледж", specialty: "Дизайн", score: 4.6, type: "колледж"}
+        ]
+    },
+    "Омск": {
+        universities: [
+            {name: "ОмГУ", specialty: "Фундаментальная информатика", score: 86, type: "университет"},
+            {name: "ОмГТУ", specialty: "Нефтегазовое дело", score: 85, type: "университет"},
+            {name: "ОмГМУ", specialty: "Лечебное дело", score: 90, type: "университет"},
+            {name: "ОмГАУ", specialty: "Агроинженерия", score: 81, type: "университет"},
+            {name: "ОмГПУ", specialty: "Педагогическое образование", score: 83, type: "университет"},
+            {name: "ОГИС", specialty: "Товароведение", score: 82, type: "университет"},
+            {name: "ОмЮА", specialty: "Юриспруденция", score: 87, type: "университет"},
+            {name: "ОГИК", specialty: "Социально-культурная деятельность", score: 84, type: "университет"},
+            {name: "ОФ РАНХиГС", specialty: "Государственное управление", score: 85, type: "университет"},
+            {name: "СибАДИ", specialty: "Строительство дорог", score: 83, type: "университет"}
+        ],
+        colleges: [
+            {name: "Омский медицинский колледж", specialty: "Сестринское дело", score: 4.7, type: "колледж"},
+            {name: "Омский авиационный колледж", specialty: "Технология машиностроения", score: 4.6, type: "колледж"},
+            {name: "Омский строительный колледж", specialty: "Строительство и эксплуатация зданий", score: 4.5, type: "колледж"},
+            {name: "Омский колледж профессиональных технологий", specialty: "Компьютерные системы и комплексы", score: 4.5, type: "колледж"},
+            {name: "Омский торгово-экономический колледж", specialty: "Коммерция", score: 4.4, type: "колледж"},
+            {name: "Омский юридический колледж", specialty: "Право и организация соц. обеспечения", score: 4.7, type: "колледж"},
+            {name: "Омский музыкально-педагогический колледж", specialty: "Музыкальное образование", score: 4.8, type: "колледж"},
+            {name: "Омский колледж управления и сервиса", specialty: "Гостиничное дело", score: 4.4, type: "колледж"},
+            {name: "Омский нефтехимический колледж", specialty: "Переработка нефти и газа", score: 4.6, type: "колледж"},
+            {name: "Омский художественно-промышленный колледж", specialty: "Дизайн", score: 4.7, type: "колледж"}
+        ]
+    },
+    "Челябинск": {
+        universities: [
+            {name: "ЮУрГУ", specialty: "Авиастроение", score: 87, type: "университет"},
+            {name: "ЧелГУ", specialty: "Юриспруденция", score: 86, type: "университет"},
+            {name: "ЧГМУ", specialty: "Лечебное дело", score: 90, type: "университет"},
+            {name: "ЧГПУ", specialty: "Педагогическое образование", score: 83, type: "университет"},
+            {name: "ЧГИК", specialty: "Библиотечно-информационная деятельность", score: 84, type: "университет"},
+            {name: "ЧГАУ", specialty: "Агроинженерия", score: 81, type: "университет"},
+            {name: "ЮУрГУ (НИУ)", specialty: "Электроэнергетика", score: 85, type: "университет"},
+            {name: "ЧИРПО", specialty: "Психология", score: 84, type: "университет"},
+            {name: "ЧФ РАНХиГС", specialty: "Государственное управление", score: 85, type: "университет"},
+            {name: "ЮУрГГПУ", specialty: "Филология", score: 83, type: "университет"}
+        ],
+        colleges: [
+            {name: "Челябинский медицинский колледж", specialty: "Сестринское дело", score: 4.7, type: "колледж"},
+            {name: "Челябинский юридический колледж", specialty: "Право и организация соц. обеспечения", score: 4.8, type: "колледж"},
+            {name: "Челябинский политехнический колледж", specialty: "Технология машиностроения", score: 4.6, type: "колледж"},
+            {name: "Челябинский энергетический колледж", specialty: "Теплоснабжение", score: 4.5, type: "колледж"},
+            {name: "Челябинский строительный колледж", specialty: "Строительство и эксплуатация зданий", score: 4.5, type: "колледж"},
+            {name: "Челябинский колледж информационно-промышленных технологий", specialty: "Информационные системы", score: 4.5, type: "колледж"},
+            {name: "Челябинский торгово-экономический колледж", specialty: "Экономика и бухгалтерский учет", score: 4.4, type: "колледж"},
+            {name: "Челябинский художественный колледж", specialty: "Живопись", score: 4.8, type: "колледж"},
+            {name: "Челябинский музыкальный колледж", specialty: "Инструментальное исполнительство", score: 4.9, type: "колледж"},
+            {name: "Челябинский колледж транспорта", specialty: "Организация перевозок", score: 4.4, type: "колледж"}
+        ]
+    },
+    "Саратов": {
+        universities: [
+            {name: "СГУ", specialty: "Фундаментальная механика", score: 87, type: "университет"},
+            {name: "СГТУ", specialty: "Нефтегазовое дело", score: 86, type: "университет"},
+            {name: "СГМУ", specialty: "Лечебное дело", score: 91, type: "университет"},
+            {name: "СГЭУ", specialty: "Экономика", score: 85, type: "университет"},
+            {name: "СГАУ", specialty: "Агроинженерия", score: 81, type: "университет"},
+            {name: "СГК", specialty: "Музыкально-инструментальное искусство", score: 90, type: "университет"},
+            {name: "СГЮА", specialty: "Юриспруденция", score: 89, type: "университет"},
+            {name: "СГИС", specialty: "Сервис", score: 83, type: "университет"},
+            {name: "ПИУ РАНХиГС", specialty: "Государственное управление", score: 86, type: "университет"},
+            {name: "СГАФКСТ", specialty: "Физическая культура", score: 84, type: "университет"}
+        ],
+        colleges: [
+            {name: "Саратовский медицинский колледж", specialty: "Сестринское дело", score: 4.7, type: "колледж"},
+            {name: "Саратовский политехнический колледж", specialty: "Технология машиностроения", score: 4.6, type: "колледж"},
+            {name: "Саратовский архитектурно-строительный колледж", specialty: "Строительство и эксплуатация зданий", score: 4.5, type: "колледж"},
+            {name: "Саратовский колледж кулинарного искусства", specialty: "Технология продукции общепита", score: 4.3, type: "колледж"},
+            {name: "Саратовский финансово-технологический колледж", specialty: "Экономика и бухгалтерский учет", score: 4.5, type: "колледж"},
+            {name: "Саратовский юридический колледж", specialty: "Право и организация соц. обеспечения", score: 4.7, type: "колледж"},
+            {name: "Саратовский музыкальный колледж", specialty: "Вокальное искусство", score: 4.9, type: "колледж"},
+            {name: "Саратовский художественный колледж", specialty: "Дизайн", score: 4.6, type: "колледж"},
+            {name: "Саратовский колледж радиоэлектроники", specialty: "Радиоаппаратостроение", score: 4.4, type: "колледж"},
+            {name: "Саратовский педагогический колледж", specialty: "Дошкольное образование", score: 4.6, type: "колледж"}
+        ]
+    },
+    "Тюмень": {
+        universities: [
+            {name: "ТюмГУ", specialty: "Нефтегазовое дело", score: 88, type: "университет"},
+            {name: "ТИУ", specialty: "Разработка нефтяных месторождений", score: 89, type: "университет"},
+            {name: "ТГМУ", specialty: "Лечебное дело", score: 91, type: "университет"},
+            {name: "ТюмГАУ", specialty: "Агроинженерия", score: 82, type: "университет"},
+            {name: "ТюмГИК", specialty: "Социально-культурная деятельность", score: 85, type: "университет"},
+            {name: "ТюмНЦ СО РАН", specialty: "Химия", score: 87, type: "университет"},
+            {name: "ТФ РАНХиГС", specialty: "Государственное управление", score: 86, type: "университет"},
+            {name: "ТИНРО-Центр", specialty: "Водные биоресурсы", score: 83, type: "университет"},
+            {name: "ТФ МГУ", specialty: "Филология", score: 88, type: "университет"},
+            {name: "ТФ СПбГУ", specialty: "Юриспруденция", score: 89, type: "университет"}
+        ],
+        colleges: [
+            {name: "Тюменский медицинский колледж", specialty: "Сестринское дело", score: 4.8, type: "колледж"},
+            {name: "Тюменский колледж транспорта", specialty: "Организация перевозок", score: 4.6, type: "колледж"},
+            {name: "Тюменский нефтегазовый колледж", specialty: "Разработка нефтяных месторождений", score: 4.7, type: "колледж"},
+            {name: "Тюменский политехнический колледж", specialty: "Технология машиностроения", score: 4.6, type: "колледж"},
+            {name: "Тюменский строительный колледж", specialty: "Строительство и эксплуатация зданий", score: 4.5, type: "колледж"},
+            {name: "Тюменский колледж информатики и связи", specialty: "Инфокоммуникационные сети", score: 4.5, type: "колледж"},
+            {name: "Тюменский торгово-экономический колледж", specialty: "Коммерция", score: 4.4, type: "колледж"},
+            {name: "Тюменский юридический колледж", specialty: "Право и организация соц. обеспечения", score: 4.7, type: "колледж"},
+            {name: "Тюменский музыкальный колледж", specialty: "Инструментальное исполнительство", score: 4.9, type: "колледж"},
+            {name: "Тюменский художественный колледж", specialty: "Дизайн", score: 4.6, type: "колледж"}
+        ]
+    },
+    "Ижевск": {
+        universities: [
+            {name: "УдГУ", specialty: "Фундаментальная информатика", score: 85, type: "университет"},
+            {name: "ИжГТУ", specialty: "Оружейно-пушечное дело", score: 86, type: "университет"},
+            {name: "ИГМА", specialty: "Лечебное дело", score: 90, type: "университет"},
+            {name: "ИжГСХА", specialty: "Агроинженерия", score: 81, type: "университет"},
+            {name: "ИжГТУ (филиал)", specialty: "Автомобилестроение", score: 83, type: "университет"},
+            {name: "ИжГИИ", specialty: "Музыкально-инструментальное искусство", score: 88, type: "университет"},
+            {name: "ИжГПУ", specialty: "Педагогическое образование", score: 82, type: "университет"},
+            {name: "ИФ РАНХиГС", specialty: "Государственное управление", score: 84, type: "университет"},
+            {name: "ИжГТУ (ВФ)", specialty: "Радиотехника", score: 83, type: "университет"},
+            {name: "ИжГИИ (филиал)", specialty: "Дизайн", score: 85, type: "университет"}
+        ],
+        colleges: [
+            {name: "Ижевский медицинский колледж", specialty: "Сестринское дело", score: 4.7, type: "колледж"},
+            {name: "Ижевский промышленно-экономический колледж", specialty: "Экономика и бухгалтерский учет", score: 4.6, type: "колледж"},
+            {name: "Ижевский машиностроительный техникум", specialty: "Технология машиностроения", score: 4.7, type: "колледж"},
+            {name: "Ижевский политехнический колледж", specialty: "Компьютерные системы и комплексы", score: 4.5, type: "колледж"},
+            {name: "Ижевский строительный колледж", specialty: "Строительство и эксплуатация зданий", score: 4.5, type: "колледж"},
+            {name: "Ижевский торгово-экономический колледж", specialty: "Коммерция", score: 4.4, type: "колледж"},
+            {name: "Ижевский юридический колледж", specialty: "Право и организация соц. обеспечения", score: 4.7, type: "колледж"},
+            {name: "Ижевский музыкальный колледж", specialty: "Вокальное искусство", score: 4.9, type: "колледж"},
+            {name: "Ижевский художественный колледж", specialty: "Живопись", score: 4.8, type: "колледж"},
+            {name: "Ижевский колледж энергетики", specialty: "Теплоснабжение", score: 4.4, type: "колледж"}
+        ]
+    },
+    "Барнаул": {
+        universities: [
+            {name: "АлтГУ", specialty: "Восточные языки", score: 86, type: "университет"},
+            {name: "АлтГТУ", specialty: "Пищевая биотехнология", score: 84, type: "университет"},
+            {name: "АГМУ", specialty: "Лечебное дело", score: 90, type: "университет"},
+            {name: "АГАУ", specialty: "Агроинженерия", score: 81, type: "университет"},
+            {name: "АГПУ", specialty: "Педагогическое образование", score: 83, type: "университет"},
+            {name: "АлтГПА", specialty: "Психология", score: 85, type: "университет"},
+            {name: "АГИК", specialty: "Библиотечно-информационная деятельность", score: 84, type: "университет"},
+            {name: "АФ РАНХиГС", specialty: "Государственное управление", score: 85, type: "университет"},
+            {name: "АлтГТУ (филиал)", specialty: "Строительство", score: 82, type: "университет"},
+            {name: "АГМУ (филиал)", specialty: "Фармация", score: 87, type: "университет"}
+        ],
+        colleges: [
+            {name: "Барнаульский базовый медицинский колледж", specialty: "Сестринское дело", score: 4.7, type: "колледж"},
+            {name: "Барнаульский государственный педагогический колледж", specialty: "Дошкольное образование", score: 4.6, type: "колледж"},
+            {name: "Барнаульский техникум сервиса и дизайна", specialty: "Парикмахерское искусство", score: 4.4, type: "колледж"},
+            {name: "Барнаульский строительный колледж", specialty: "Строительство и эксплуатация зданий", score: 4.5, type: "колледж"},
+            {name: "Барнаульский колледж информационных технологий", specialty: "Информационные системы", score: 4.5, type: "колледж"},
+            {name: "Барнаульский торгово-экономический колледж", specialty: "Коммерция", score: 4.4, type: "колледж"},
+            {name: "Барнаульский юридический колледж", specialty: "Право и организация соц. обеспечения", score: 4.7, type: "колледж"},
+            {name: "Барнаульский музыкальный колледж", specialty: "Инструментальное исполнительство", score: 4.9, type: "колледж"},
+            {name: "Барнаульский художественный колледж", specialty: "Дизайн", score: 4.6, type: "колледж"},
+            {name: "Барнаульский колледж водного транспорта", specialty: "Судовождение", score: 4.5, type: "колледж"}
+        ]
+    },
+    "Оренбург": {
+        universities: [
+            {name: "ОГУ", specialty: "Нефтегазовое дело", score: 85, type: "университет"},
+            {name: "Оренбургский ГМУ", specialty: "Лечебное дело", score: 91, type: "университет"},
+            {name: "Оренбургский ГАУ", specialty: "Агроинженерия", score: 80, type: "университет"},
+            {name: "Оренбургский ГПУ", specialty: "Педагогическое образование", score: 82, type: "университет"},
+            {name: "Оренбургский институт путей сообщения", specialty: "Строительство ж/д", score: 81, type: "университет"},
+            {name: "Оренбургский филиал РАНХиГС", specialty: "Государственное управление", score: 83, type: "университет"},
+            {name: "Оренбургский филиал МГЮА", specialty: "Юриспруденция", score: 86, type: "университет"},
+            {name: "Оренбургский филиал МГИУ", specialty: "Экономика", score: 84, type: "университет"},
+            {name: "Оренбургский филиал СПбГУП", specialty: "Менеджмент", score: 82, type: "университет"},
+            {name: "Оренбургский филиал УИУ РАНХиГС", specialty: "Управление персоналом", score: 81, type: "университет"}
+        ],
+        colleges: [
+            {name: "Оренбургский учетно-финансовый колледж", specialty: "Экономика и бухгалтерский учет", score: 4.7, type: "колледж"},
+            {name: "Оренбургский медицинский колледж", specialty: "Сестринское дело", score: 4.8, type: "колледж"},
+            {name: "Оренбургский колледж экономики и информатики", specialty: "Информационные системы", score: 4.6, type: "колледж"},
+            {name: "Оренбургский автотранспортный колледж", specialty: "Техническое обслуживание авто", score: 4.5, type: "колледж"},
+            {name: "Оренбургский государственный колледж", specialty: "Право и организация соц. обеспечения", score: 4.7, type: "колледж"},
+            {name: "Оренбургский колледж связи", specialty: "Почтовая связь", score: 4.4, type: "колледж"},
+            {name: "Оренбургский техникум железнодорожного транспорта", specialty: "Организация перевозок", score: 4.6, type: "колледж"},
+            {name: "Оренбургский строительный колледж", specialty: "Строительство", score: 4.5, type: "колледж"},
+            {name: "Оренбургский агротехнологический колледж", specialty: "Землеустройство", score: 4.3, type: "колледж"},
+            {name: "Оренбургский областной художественный колледж", specialty: "Дизайн", score: 4.8, type: "колледж"}
+        ]
+    }
+};
+
+        let currentQuestion = 0;
+        let userAnswers = [];
+
+        // Инициализация теста
+        function initSurvey() {
+            const surveyContainer = document.getElementById('survey-questions');
+            surveyContainer.innerHTML = '';
+            
+            surveyData.forEach((question, index) => {
+                const questionElement = document.createElement('div');
+                questionElement.className = 'question';
+                questionElement.style.display = index === 0 ? 'block' : 'none';
+                questionElement.id = `question-${index}`;
+                
+                let optionsHTML = '';
+                question.options.forEach((option, optIndex) => {
+                    optionsHTML += `
+                        <div class="option">
+                            <input type="radio" id="q${index}-opt${optIndex}" name="question-${index}" value="${optIndex}">
+                            <label for="q${index}-opt${optIndex}">${option}</label>
+                        </div>
+                    `;
+                });
+                
+                questionElement.innerHTML = `
+                    <h3>${index + 1}. ${question.question}</h3>
+                    <div class="options">
+                        ${optionsHTML}
+                    </div>
+                `;
+                
+                surveyContainer.appendChild(questionElement);
+            });
+            
+            updateNavigation();
+        }
+
+        // Обновление навигации
+        function updateNavigation() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            prevBtn.disabled = currentQuestion === 0;
+            
+            if (currentQuestion === surveyData.length - 1) {
+                nextBtn.textContent = 'Завершить опрос';
+            } else {
+                nextBtn.textContent = 'Далее';
+            }
+        }
+
+        // Следующий вопрос
+        function nextQuestion() {
+            const currentQuestionElement = document.getElementById(`question-${currentQuestion}`);
+            const selectedOption = currentQuestionElement.querySelector('input:checked');
+            
+            if (!selectedOption) {
+                alert('Пожалуйста, выберите вариант ответа');
+                return;
+            }
+            
+            userAnswers[currentQuestion] = parseInt(selectedOption.value);
+            
+            if (currentQuestion < surveyData.length - 1) {
+                currentQuestionElement.style.display = 'none';
+                currentQuestion++;
+                document.getElementById(`question-${currentQuestion}`).style.display = 'block';
+                updateNavigation();
+            } else {
+                showResults();
+            }
+        }
+
+        // Предыдущий вопрос
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                document.getElementById(`question-${currentQuestion}`).style.display = 'none';
+                currentQuestion--;
+                document.getElementById(`question-${currentQuestion}`).style.display = 'block';
+                updateNavigation();
+            }
+        }
+
+        // Показать результаты
+        function showResults() {
+            // Простая система подсчета очков для профессий
+            const professionScores = {};
+            
+            // Инициализируем счетчики для всех профессий
+            for (const profession in professions) {
+                professionScores[profession] = 0;
+            }
+            
+            // Логика подсчета очков на основе ответов
+            userAnswers.forEach((answer, index) => {
+                // В зависимости от вопроса начисляем очки разным профессиям
+                if (index === 0) {
+                    // Тип деятельности
+                    if (answer === 0) {
+                        // Работа с людьми
+                        professionScores["Психолог"] += 3;
+                        professionScores["Учитель"] += 3;
+                        professionScores["Врач"] += 2;
+                        professionScores["Менеджер по продажам"] += 2;
+                    } else if (answer === 1) {
+                        // Аналитическая работа
+                        professionScores["Data Scientist"] += 3;
+                        professionScores["Аналитик данных"] += 3;
+                        professionScores["Физик"] += 2;
+                        professionScores["Биолог"] += 2;
+                    } else if (answer === 2) {
+                        // Творческая деятельность
+                        professionScores["Веб-дизайнер"] += 3;
+                        professionScores["Графический дизайнер"] += 3;
+                        professionScores["Архитектор"] += 2;
+                        professionScores["Иллюстратор"] += 2;
+                    } else if (answer === 3) {
+                        // Техническая работа
+                        professionScores["Инженер-программист"] += 3;
+                        professionScores["Инженер-робототехник"] += 3;
+                        professionScores["Системный администратор"] += 2;
+                        professionScores["Инженер-электроник"] += 2;
+                    } else if (answer === 4) {
+                        // Работа с природой
+                        professionScores["Биолог"] += 3;
+                        professionScores["Эколог"] += 3;
+                        professionScores["Ветеринар"] += 2;
+                        professionScores["Ландшафтный дизайнер"] += 2;
+                    } else if (answer === 5) {
+                        // Предпринимательская деятельность
+                        professionScores["Предприниматель"] += 3;
+                        professionScores["Менеджер по продажам"] += 2;
+                        professionScores["Маркетолог"] += 2;
+                        professionScores["Финансовый советник"] += 2;
+                    }
+                }
+                // Добавьте аналогичную логику для других вопросов...
+            });
+            
+            // Фильтруем профессии по выбранному пути (9 или 11 класс)
+            const filteredProfessions = {};
+            for (const profession in professionScores) {
+                if (professions[profession].path === "both" || professions[profession].path === educationPath) {
+                    filteredProfessions[profession] = professionScores[profession];
+                }
+            }
+            
+            // Находим профессию с максимальным количеством очков
+            let recommendedProfession = "Инженер-программист";
+            let maxScore = 0;
+            
+            for (const profession in filteredProfessions) {
+                if (filteredProfessions[profession] > maxScore) {
+                    maxScore = filteredProfessions[profession];
+                    recommendedProfession = profession;
+                }
+            }
+            
+            // Если все профессии имеют 0 очков, выбираем случайную из подходящих
+            if (maxScore === 0) {
+                const suitableProfessions = Object.keys(professions).filter(prof => 
+                    professions[prof].path === "both" || professions[prof].path === educationPath
+                );
+                recommendedProfession = suitableProfessions[Math.floor(Math.random() * suitableProfessions.length)];
+            }
+            
+            const professionData = professions[recommendedProfession];
+            
+            const surveyContainer = document.querySelector('.survey-container');
+            surveyContainer.innerHTML = `
+                <div class="result-container">
+                    <div class="result-title">Результаты опроса</div>
+                    <div class="profession">${recommendedProfession}</div>
+                    <p>${professionData.description}</p>
+                    
+                    <div class="exam-info">
+                        <h3>${educationPath === '9' ? 'Предметы для поступления в колледж:' : 'Необходимые экзамены ЕГЭ:'}</h3>
+                        <ul>
+                            ${professionData.subjects.map(subject => `<li>${subject}</li>`).join('')}
+                        </ul>
+                        <p><strong>Средний ${educationPath === '9' ? 'балл аттестата' : 'проходной балл'}:</strong> ${professionData.avgScore}</p>
+                    </div>
+                    
+                    <div class="city-selection">
+                        <h3>Выберите город для поступления:</h3>
+                        <div class="city-options" id="city-options">
+                            ${Object.keys(educationInstitutions).map(city => 
+                                `<div class="city-option" onclick="selectCity('${city}')">${city}</div>`
+                            ).join('')}
+                        </div>
+                        <div id="institutions-list"></div>
+                    </div>
+                    
+                    <button class="restart-button" onclick="restartSurvey()">Пройти опрос заново</button>
+                </div>
+            `;
+        }
+
+        // Выбор города
+        function selectCity(city) {
+            const cityOptions = document.querySelectorAll('.city-option');
+            cityOptions.forEach(option => option.classList.remove('selected'));
+            
+            event.target.classList.add('selected');
+            
+            const institutionsList = document.getElementById('institutions-list');
+            const cityInstitutions = educationInstitutions[city];
+            
+            // Показываем колледжи для 9 класса и университеты для 11 класса
+            const institutionsToShow = educationPath === '9' ? cityInstitutions.colleges : cityInstitutions.universities;
+            
+            institutionsList.innerHTML = `
+                <h3>${educationPath === '9' ? 'Колледжи' : 'Вузы'} в ${city}:</h3>
+                ${institutionsToShow.map(inst => `
+                    <div class="university">
+                        <h4>${inst.name}</h4>
+                        <p><strong>Направления:</strong> ${inst.specialty}</p>
+                        <p><strong>Средний ${educationPath === '9' ? 'балл аттестата' : 'балл ЕГЭ'}:</strong> ${inst.score}</p>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        // Перезапуск опроса
+        function restartSurvey() {
+            currentQuestion = 0;
+            userAnswers = [];
+            educationPath = '';
+            
+            const surveyContainer = document.querySelector('.survey-container');
+            surveyContainer.innerHTML = `
+                <div id="education-path-selection">
+                    <h2>Выберите ваш образовательный путь</h2>
+                    <p>Это поможет нам подобрать подходящие варианты для вашего поступления</p>
+                    
+                    <div class="path-selection">
+                        <div class="path-option" onclick="selectEducationPath('9')">
+                            <h3>После 9 класса</h3>
+                            <p>Поступление в колледж или техникум</p>
+                            <p><small>На основе ОГЭ</small></p>
+                        </div>
+                        <div class="path-option" onclick="selectEducationPath('11')">
+                            <h3>После 11 класса</h3>
+                            <p>Поступление в университет или институт</p>
+                            <p><small>На основе ЕГЭ</small></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="survey-questions" style="display: none;"></div>
+
+                <div class="survey-nav" id="survey-navigation" style="display: none;">
+                    <button class="survey-button" id="prev-btn" onclick="prevQuestion()">Назад</button>
+                    <button class="survey-button" id="next-btn" onclick="nextQuestion()">Далее</button>
+                </div>
+            `;
+        }
+
+        // Показать страницу
+        function showPage(pageId) {
+            document.getElementById('home-page').style.display = pageId === 'home' ? 'flex' : 'none';
+            document.getElementById('survey-page').style.display = pageId === 'survey' ? 'block' : 'none';
+            
+            if (pageId === 'survey') {
+                restartSurvey();
+                // Прокручиваем к тесту после небольшой задержки, чтобы страница успела отрендериться
+                setTimeout(() => {
+                    document.getElementById('survey-page').scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+            } else {
+                window.scrollTo(0, 0);
+            }
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Плавная прокрутка для якорных ссылок
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Анимация появления элементов при прокрутке
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.step, .feature').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'all 0.6s ease';
+                observer.observe(el);
+            });
+            
+
+            // Параллакс эффект для фона
+            window.addEventListener('scroll', function() {
+                const scrolled = window.pageYOffset;
+                const heroBg = document.querySelector('.hero-bg');
+                heroBg.style.transform = `translateY(${scrolled * 0.5}px)`;
+                
+                // Изменение хедера при прокрутке
+                const header = document.getElementById('header');
+                if (scrolled > 100) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+
+            // Обновление года в футере
+            document.querySelector('.copyright p').innerHTML = `&copy; ${new Date().getFullYear()} SkillPath. Все права защищены. | AI Карьерный Навигатор`;
+
+            // Создание анимации "искр" в герое
+            function createSparkles() {
+                const hero = document.querySelector('.hero');
+                for (let i = 0; i < 8; i++) {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'sparkle';
+                    sparkle.style.left = Math.random() * 100 + '%';
+                    sparkle.style.top = Math.random() * 100 + '%';
+                    sparkle.style.animationDelay = Math.random() * 3 + 's';
+                    hero.appendChild(sparkle);
+                }
+            }
+
+            createSparkles();
+        });
+    </script>
+
+    <!-- Qt mini-window launcher: fixed helper button -->
+    <a href="launch_career_guidance.bat" style="position: fixed; right: 20px; bottom: 20px; text-decoration: none; padding: 12px 16px; border-radius: 12px; background: var(--accent); color: var(--light); box-shadow: 0 8px 20px rgba(0,0,0,0.1); font-weight: 600; z-index: 9999;">
+        Открыть окно карьеры (Qt)
+    </a>
+</body>
+</html>
